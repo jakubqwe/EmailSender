@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ElasticEmail.Model;
+﻿using ElasticEmail.Model;
 
-namespace EmailSender
+namespace EmailSender;
+
+internal interface IInputProvider
 {
-    internal interface IInputProvider
-    {
-        public string GetApiKey();
+    public string GetApiKey();
 
-        public EmailMessageData GetMessageData();
+    public EmailMessageData GetMessageData();
 
-        public MergeEmailPayload GetMergeEmailPayload();
+    public MergeEmailPayload GetMergeEmailPayload();
 
-        public bool GetIsMergeFileProvided();
-    }
+    public bool GetIsMergeFileProvided();
+
+    public bool GetContinue();
 }

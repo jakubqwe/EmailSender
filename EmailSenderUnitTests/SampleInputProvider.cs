@@ -10,10 +10,13 @@ namespace EmailSenderUnitTests
 {
     public class SampleInputProvider : IInputProvider
     {
-        public bool _mergeFileProvided;
-        public SampleInputProvider(bool mergeFile)
+        public bool MergeFileProvided;
+        public bool Rerun;
+        private int count = 0;
+        public SampleInputProvider(bool mergeFile, bool rerun)
         {
-            _mergeFileProvided = mergeFile;
+            MergeFileProvided = mergeFile;
+            Rerun = rerun;
         }
         public string GetApiKey()
         {
@@ -22,6 +25,10 @@ namespace EmailSenderUnitTests
 
         private EmailContent GetContent()
         {
+            if (count++ == 2)
+            {
+                Rerun = false;
+            }
             return new EmailContent
             {
                 Body = new List<BodyPart>
@@ -48,7 +55,12 @@ namespace EmailSenderUnitTests
 
         public bool GetIsMergeFileProvided()
         {
-            return _mergeFileProvided;
+            return MergeFileProvided;
+        }
+
+        public bool GetContinue()
+        {
+            return Rerun;
         }
     }
 }

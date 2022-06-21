@@ -1,60 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ElasticEmail.Api;
-using ElasticEmail.Client;
+﻿using ElasticEmail.Api;
 using ElasticEmail.Model;
 using EmailSender.Core;
 
-namespace EmailSender
+namespace EmailSender;
+
+internal class Engine
 {
-    internal class Engine
+    private readonly IEmailsApi _emailsApi;
+    private readonly IInputProvider _inputProvider;
+
+    public Engine(IEmailsApi emailsApi, IInputProvider inputProvider)
     {
-        private readonly IEmailsApi _emailsApi;
-        private readonly IInputProvider _inputProvider;
-        internal bool IsMultipleInputExpected;
+        _emailsApi = emailsApi;
+        _inputProvider = inputProvider;
 
-        public Engine(IEmailsApi emailsApi, IInputProvider inputProvider, bool isMultipleInputExpected)
+        emailsApi.Configuration = _inputProvider.GetApiKey().CreateConfig();
+    }
+
+    public void Run()
+    {
+        bool shouldRepeat;
+        do
         {
-            _emailsApi = emailsApi;
-            _inputProvider = inputProvider;
-            IsMultipleInputExpected = isMultipleInputExpected;
-
-            emailsApi.Configuration = _inputProvider.GetApiKey().CreateConfig();
-        }
-
-        public void Run()
-        {
-            do
+            try
             {
-                try
+                if (_inputProvider.GetIsMergeFileProvided())
                 {
-                    if (_inputProvider.GetIsMergeFileProvided())
-                    {
-                        SendEmailFromMergePayload();
-                        continue;
-                    }
+                    SendEmailFromMergePayload();
+                }
+                else
+                {
                     SendEmailFromMessageData();
                 }
 
-                catch (Exception exception)
-                {
-                    Console.WriteLine(exception.Message);
-                }
+                Console.WriteLine("Email sent");
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
 
-            } while (IsMultipleInputExpected);
-        }
+            shouldRepeat = _inputProvider.GetContinue();
+        } while (shouldRepeat);
+    }
 
-        public EmailSend SendEmailFromMessageData()
-        {
-            return _emailsApi.EmailsPost(_inputProvider.GetMessageData());
-        }
+    public EmailSend SendEmailFromMessageData()
+    {
+        return _emailsApi.EmailsPost(_inputProvider.GetMessageData());
+    }
 
-        public EmailSend SendEmailFromMergePayload()
-        {
-            return _emailsApi.EmailsMergefilePost(_inputProvider.GetMergeEmailPayload());
-        }
+    public EmailSend SendEmailFromMergePayload()
+    {
+        return _emailsApi.EmailsMergefilePost(_inputProvider.GetMergeEmailPayload());
     }
 }

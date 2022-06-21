@@ -1,20 +1,12 @@
-﻿using System.Diagnostics;
-using System.Net.Mail;
-using ElasticEmail;
-using ElasticEmail.Client;
-using ElasticEmail.Api;
-using ElasticEmail.Model;
-using EmailSender.Core;
+﻿using ElasticEmail.Api;
 
+namespace EmailSender;
 
-namespace EmailSender
+internal class Program
 {
-    internal class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            var engine = new Engine(new EmailsApi(), new ConsoleInputProvider(), args.FirstOrDefault() == "-m");
-            engine.Run();
-        }
+        var engine = new Engine(new EmailsApi(), new ConsoleInputProvider());
+        engine.Run();
     }
 }
